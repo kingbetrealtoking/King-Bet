@@ -1,41 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="si">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KingBet - Register</title>
     <style>
-        body { 
-            font-family: sans-serif; 
-            background: #1a1a1a; 
-            color: white; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            margin: 0; 
-        }
+        body { font-family: sans-serif; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         h1 { color: #ffcc00; margin-bottom: 20px; }
-        input { 
-            width: 85%; 
-            padding: 12px; 
-            margin: 10px 0; 
-            border-radius: 8px; 
-            border: 1px solid #444; 
-            background: #333; 
-            color: white; 
-        }
-        button { 
-            background: #ffcc00; 
-            color: black; 
-            padding: 12px 40px; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            width: 90%; 
-            margin-top: 15px; 
-        }
+        input { width: 85%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #333; color: white; box-sizing: border-box; }
+        button { background: #ffcc00; color: black; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 85%; margin-top: 15px; }
         .login-link { margin-top: 20px; }
         a { color: #ffcc00; text-decoration: none; }
     </style>
@@ -43,14 +16,62 @@
 <body>
     <h1>Create Account</h1>
     
-    <input type="text" placeholder="Full Name">
-    <input type="email" placeholder="Email Address">
-    <input type="password" placeholder="Create Password">
+    <input type="text" id="name" placeholder="Full Name">
+    <input type="email" id="email" placeholder="Email Address">
+    <input type="password" id="password" placeholder="Create Password">
     
-    <button onclick="window.location.href='https://wa.me/94770060428?text=මම%20KingBet%20එකේ%20Register%20වෙන්න%20ආවා.'">Register</button>
+    <button id="regBtn">Register</button>
     
     <div class="login-link">
         <p>Already have an account? <a href="index.html">Login here</a></p>
     </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        // ඔබේ Firebase Config මෙතැනට ඇතුළත් කරන්න
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        document.getElementById('regBtn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const name = document.getElementById('name').value;
+
+            if(!email || !password || !name) {
+                alert("කරුණාකර සියලුම විස්තර පුරවන්න.");
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                await setDoc(doc(db, "users", user.uid), {
+                    name: name,
+                    email: email,
+                    balance: 0.00,
+                    accountNumber: "ACC-" + Math.floor(100000 + Math.random() * 900000)
+                });
+
+                alert("ගිණුම සාර්ථකව නිර්මාණය විය!");
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                alert("දෝෂයක් ඇතිවිය: " + error.message);
+            }
+        });
+    </script>
 </body>
 </html>
