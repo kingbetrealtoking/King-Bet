@@ -3,49 +3,71 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KingBet - Dashboard</title>
-    <script src="lang.js"></script> 
     <style>
         body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; }
         .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .wallet-card { background: #333; padding: 20px; border-radius: 15px; border: 1px solid #ffcc00; text-align: center; }
         .balance { font-size: 32px; color: #ffcc00; font-weight: bold; margin: 10px 0; }
+        .acc-id { font-size: 14px; color: #ccc; margin-bottom: 10px; }
         .btn-box { display: flex; gap: 15px; justify-content: center; margin: 20px 0; }
         button { padding: 15px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1; }
         .dep-btn { background: #28a745; color: white; }
         .with-btn { background: #dc3545; color: white; }
-        .history-link { display: block; text-align: center; margin-top: 10px; color: #ffcc00; text-decoration: none; font-size: 14px; }
         .game-list { margin-top: 20px; background: #222; padding: 15px; border-radius: 10px; }
         .game-item { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #444; color: white; text-decoration: none; font-size: 18px; }
     </style>
 </head>
 <body>
     <div class="top-nav">
-        <h2 data-lang="dashboard">Dashboard</h2>
-        <a href="settings.html" style="color:#ffcc00; text-decoration:none;">⚙️ <span data-lang="settings">Settings</span></a>
+        <h2>Dashboard</h2>
+        <a href="settings.html" style="color:#ffcc00; text-decoration:none;">⚙️ Settings</a>
     </div>
     
     <div class="wallet-card">
-        <p data-lang="balance">Current Balance</p>
-        <div class="balance" id="bal">1000.00</div>
-        <a href="history.html" class="history-link">View Transaction History</a>
+        <p>Current Balance</p>
+        <div class="balance" id="bal">Loading...</div>
+        <div class="acc-id" id="accNum">Loading Account...</div>
     </div>
     
     <div class="btn-box">
-        <button class="dep-btn" onclick="location.href='deposit.html'" data-lang="deposit">Deposit</button>
-        <button class="with-btn" onclick="location.href='withdraw.html'" data-lang="withdraw">Withdraw</button>
+        <button class="dep-btn" onclick="location.href='deposit.html'">Deposit</button>
+        <button class="with-btn" onclick="location.href='withdraw.html'">Withdraw</button>
     </div>
 
     <div class="game-list">
-        <h3 data-lang="games">Available Games</h3>
-        <a href="game.html" class="game-item" data-lang="color">Color Prediction</a>
-        <a href="game2.html" class="game-item" data-lang="dice">Lucky Dice</a>
-        <a href="game3.html" class="game-item" data-lang="coin">Coin Flip</a>
-        <a href="#" class="game-item" data-lang="football">Football Betting</a>
+        <h3>Available Games</h3>
+        <a href="game.html" class="game-item">Color Prediction</a>
+        <a href="game2.html" class="game-item">Lucky Dice</a>
+        <a href="game3.html" class="game-item">Coin Flip</a>
+        <a href="#" class="game-item">Football Betting</a>
     </div>
 
-    <script>
-        document.getElementById('bal').innerText = (parseFloat(localStorage.getItem('userBalance')) || 1000.00).toFixed(2);
-        applyLanguage();
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        // මෙතනට ඔයාගේ firebaseConfig දාන්න
+        const firebaseConfig = { /* ඔයාගේ config එක මෙතනට දාන්න */ };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // ලොග් වූ පරිශීලකයාගේ දත්ත Firestore එකෙන් ලබා ගැනීම
+                onSnapshot(doc(db, "users", user.uid), (doc) => {
+                    if (doc.exists()) {
+                        const data = doc.data();
+                        document.getElementById('bal').innerText = parseFloat(data.balance).toFixed(2);
+                        document.getElementById('accNum').innerText = "ID: " + data.accountNumber;
+                    }
+                });
+            } else {
+                window.location.href = "index.html"; // ලොග් වෙලා නැත්නම් login පේජ් එකට යවන්න
+            }
+        });
     </script>
 </body>
 </html>
