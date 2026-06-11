@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KingBet - Dashboard</title>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; margin: 0; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .wallet-card { background: #333; padding: 20px; border-radius: 15px; border: 1px solid #ffcc00; text-align: center; }
+        .balance { font-size: 32px; color: #ffcc00; font-weight: bold; margin: 10px 0; }
+        .btn-box { display: flex; gap: 15px; justify-content: center; margin: 20px 0; }
+        button { padding: 15px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1; }
+        .dep-btn { background: #28a745; color: white; }
+        .with-btn { background: #dc3545; color: white; }
+        .history-link { display: block; text-align: center; margin-top: 10px; color: #ffcc00; text-decoration: none; font-size: 14px; }
+        .game-list { margin-top: 20px; background: #222; padding: 15px; border-radius: 10px; }
+        .game-item { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #444; color: white; text-decoration: none; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <h2>Dashboard</h2>
+        <a href="settings.html" style="color:#ffcc00; text-decoration:none;">⚙️ Settings</a>
+    </div>
+    
+    <div class="wallet-card">
+        <p>Current Balance</p>
+        <div class="balance" id="bal">0.00</div>
+        <a href="history.html" class="history-link">View Transaction History</a>
+    </div>
+    
+    <div class="btn-box">
+        <button class="dep-btn" onclick="location.href='deposit.html'">Deposit</button>
+        <button class="with-btn" onclick="location.href='withdraw.html'">Withdraw</button>
+    </div>
+
+    <div class="game-list">
+        <h3>Available Games</h3>
+        <a href="game.html" class="game-item">Color Prediction</a>
+        <a href="game2.html" class="game-item">Lucky Dice</a>
+        <a href="game3.html" class="game-item">Coin Flip</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfYvK9RLWgTYN05JMQ-jLfZfnXfEHMZjo",
+            authDomain: "sl-bet.firebaseapp.com",
+            projectId: "sl-bet",
+            storageBucket: "sl-bet.firebasestorage.app",
+            messagingSenderId: "318305942205",
+            appId: "1:318305942205:web:3697112fdec83fef7cbe44"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app); // මෙතන දැන් හරියට හදලා තියෙන්නේ
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const userDocRef = doc(db, "users", user.uid);
+                onSnapshot(userDocRef, (doc) => {
+                    if (doc.exists()) {
+                        const balance = doc.data().balance || 0;
+                        document.getElementById('bal').innerText = parseFloat(balance).toFixed(2);
+                    }
+                });
+            } else {
+                // පරිශීලකයා ලොග් වෙලා නැත්නම් login.html වෙත යවන්න
+                window.location.href = "login.html";
+            }
+        });
+    </script>
+</body>
+</html>

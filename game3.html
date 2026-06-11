@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Coin Flip</title>
+    <script src="lang.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; text-align: center; padding: 15px; }
+        .balance { font-size: 24px; color: #ffcc00; margin-bottom: 20px; }
+        .coin { width: 120px; height: 120px; background: #ffcc00; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; color: black; margin: 20px auto; border: 5px solid #fff; }
+        .flip-anim { animation: flip 0.6s linear infinite; }
+        @keyframes flip { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+        button { padding: 10px 20px; margin: 5px; border-radius: 5px; border: none; cursor: pointer; }
+        .selected { background: #ffcc00 !important; color: black; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <a href="dashboard.html" style="color:white; display:block; text-align:left; margin-bottom:10px;">← Back</a>
+    <div class="balance">Balance: Rs <span id="bal">1000</span></div>
+    <div class="coin" id="coin">?</div>
+
+    <div>තෝරන්න (Select):</div>
+    <button onclick="selChoice('HEADS', this)">HEADS</button>
+    <button onclick="selChoice('TAILS', this)">TAILS</button>
+    <br><br>
+    <div>මුදල (Amount):</div>
+    <div id="amtBtns"><script>[0.5, 1, 2, 5, 10, 25, 50].forEach(a => document.write(`<button onclick="selectAmt(${a}, this)">Rs ${a}</button>`));</script></div>
+    <input type="number" id="amt" placeholder="Custom (0.5-50)">
+    <br><br>
+    <button onclick="playFlip()" style="background:#28a745; color:white; width:80%; padding:15px">Flip Coin</button>
+    <h3 id="res"></h3>
+
+    <script>
+        let balance = parseFloat(localStorage.getItem('userBalance')) || 1000.00;
+        document.getElementById('bal').innerText = balance.toFixed(2);
+
+        let choice = "", selAmt = 0;
+        
+        function selChoice(c, b) { 
+            choice = c; 
+            document.querySelectorAll('button').forEach(x=>x.classList.remove('selected')); 
+            b.classList.add('selected'); 
+        }
+        function selectAmt(a, b) { 
+            selAmt = a; 
+            document.querySelectorAll('#amtBtns button').forEach(x=>x.classList.remove('selected')); 
+            b.classList.add('selected'); 
+        }
+
+        // දිනය සහ වෙලාව සහිත History function එක
+        function saveToHistory(gameName, amount, isWin) {
+            let history = JSON.parse(localStorage.getItem('betHistory')) || [];
+            let now = new Date();
+            let timeString = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            history.push({ 
+                game: gameName, 
+                amount: amount, 
+                status: isWin ? 'win' : 'lose',
+                time: timeString 
+            });
+            localStorage.setItem('betHistory', JSON.stringify(history));
+        }
+
+        function playFlip() {
+            let bet = parseFloat(document.getElementById('amt').value) || selAmt;
+            if(!choice || bet < 0.5 || bet > 50) return alert("නිවැරදි තේරීමක් සහ මුදලක් ඇතුළත් කරන්න!");
+            if(bet > balance) return alert("බැලන්ස් එක මදි!");
+
+            let c = document.getElementById('coin'); 
+            c.classList.add('flip-anim');
+            
+            setTimeout(() => {
+                c.classList.remove('flip-anim');
+                let res = Math.random() > 0.5 ? "HEADS" : "TAILS";
+                c.innerHTML = res;
+                
+                if(res == choice) { 
+                    balance += bet; 
+                    document.getElementById('res').innerHTML = `<span style='color:green'>Congratulations! Won Rs ${bet}</span>`; 
+                    saveToHistory('Coin Flip', bet, true);
+                } else { 
+                    balance -= bet; 
+                    document.getElementById('res').innerHTML = `<span style='color:red'>Opps Very Sad! Lost Rs ${bet}</span>`; 
+                    saveToHistory('Coin Flip', bet, false);
+                }
+                document.getElementById('bal').innerText = balance.toFixed(2);
+                localStorage.setItem('userBalance', balance);
+            }, 1000);
+        }
+        applyLanguage();
+    </script>
+</body>
+</html>

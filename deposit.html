@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KingBet - Deposit</title>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; }
+        .box { background: #333; padding: 20px; border-radius: 15px; border: 1px solid #ffcc00; }
+        h2 { color: #ffcc00; text-align: center; }
+        .details { margin: 20px 0; padding: 15px; background: #222; border-radius: 10px; }
+        p { margin: 10px 0; }
+        .btn-confirm { background: #28a745; color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Deposit Funds</h2>
+        <div class="details">
+            <p><strong>Bank:</strong> BOC</p>
+            <p><strong>Branch:</strong> DEHIOWITA</p>
+            <p><strong>Account Name:</strong> SUPUN NIRMAL WEERASINGHA</p>
+            <p><strong>Account Number:</strong> 0070563857</p>
+        </div>
+        <p style="font-size: 0.9em; color: #ccc;">මුදල් තැන්පත් කිරීමෙන් පසු පහත බොත්තම ඔබා අපට WhatsApp හරහා රිසිට් පත (Slip) එවන්න.</p>
+        
+        <button class="btn-confirm" onclick="confirmDeposit()">Confirm Deposit</button>
+    </div>
+
+    <script>
+        function confirmDeposit() {
+            // History එකට එකතු කිරීම (Deposit සඳහා)
+            let history = JSON.parse(localStorage.getItem('betHistory')) || [];
+            let now = new Date();
+            let timeString = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            history.push({ 
+                game: 'Deposit (Bank)', 
+                amount: 'PENDING', 
+                status: 'deposit', // අපි මේක 'deposit' ලෙස දානවා
+                time: timeString 
+            });
+            localStorage.setItem('betHistory', JSON.stringify(history));
+
+            // WhatsApp එකට යාම
+            window.location.href='https://wa.me/+94722904440?text=මම%20KingBet%20එකට%20මුදල්%20තැන්පත්%20කළා.%20මෙන්න%20Slip%20එක.';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Prediction</title>
+    <script src="lang.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; text-align: center; padding: 10px; }
+        .back-btn { display: block; text-align: left; color: white; text-decoration: none; margin-bottom: 10px; }
+        .balance-box { font-size: 20px; color: #ffcc00; margin-bottom: 10px; }
+        .card { width: 90%; height: 200px; margin: 0 auto; background: #333; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 50px; font-weight: bold; border: 5px solid #555; }
+        .btn-box { margin-top: 20px; }
+        .amount-btn, .color-btn { padding: 15px; margin: 5px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .amount-btn { background: #444; color: white; }
+        .color-btn { width: 50px; height: 50px; border-radius: 50%; }
+        .selected { border: 3px solid white; outline: 3px solid #ffcc00; }
+        .start-btn { background: #28a745; color: white; width: 80%; margin-top: 20px; font-size: 18px; padding: 15px; border: none; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <a href="dashboard.html" class="back-btn">← Back</a>
+    <div class="balance-box">Balance: LKR <span id="balance">1000</span></div>
+    <div class="card" id="gameCard">?</div>
+    
+    <div class="btn-box">
+        <button class="color-btn" style="background:#dc3545" onclick="selectColor('#dc3545', this)"></button>
+        <button class="color-btn" style="background:#28a745" onclick="selectColor('#28a745', this)"></button>
+        <button class="color-btn" style="background:#007bff" onclick="selectColor('#007bff', this)"></button>
+        <button class="color-btn" style="background:#ffc107" onclick="selectColor('#ffc107', this)"></button>
+        <button class="color-btn" style="background:#fd7e14" onclick="selectColor('#fd7e14', this)"></button>
+    </div>
+
+    <div class="btn-box">
+        <button class="amount-btn" onclick="selectAmount(8, this)">8</button>
+        <button class="amount-btn" onclick="selectAmount(16, this)">16</button>
+        <button class="amount-btn" onclick="selectAmount(24, this)">24</button>
+        <button class="amount-btn" onclick="selectAmount(48, this)">48</button>
+    </div>
+    
+    <button class="start-btn" onclick="startGame()">Next Start</button>
+    <h2 id="msg"></h2>
+
+    <script>
+        let balance = parseFloat(localStorage.getItem('userBalance')) || 1000;
+        document.getElementById('balance').innerText = balance.toFixed(2);
+
+        let selectedAmount = 0;
+        let selectedColor = "";
+        const colors = ['#dc3545', '#28a745', '#007bff', '#ffc107', '#fd7e14'];
+
+        function selectAmount(amt, btn) {
+            selectedAmount = amt;
+            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        function selectColor(color, btn) {
+            selectedColor = color;
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        // දිනය සහ වෙලාව සහිත History function එක
+        function saveToHistory(gameName, amount, isWin) {
+            let history = JSON.parse(localStorage.getItem('betHistory')) || [];
+            let now = new Date();
+            let timeString = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            history.push({ 
+                game: gameName, 
+                amount: amount, 
+                status: isWin ? 'win' : 'lose',
+                time: timeString 
+            });
+            localStorage.setItem('betHistory', JSON.stringify(history));
+        }
+
+        function startGame() {
+            if (selectedAmount === 0 || selectedColor === "") { alert("වර්ණයක් සහ මුදලක් තෝරන්න!"); return; }
+            if (selectedAmount > balance) { alert("බැලන්ස් එක මදි!"); return; }
+            
+            let count = 5;
+            let card = document.getElementById('gameCard');
+            let msg = document.getElementById('msg');
+            
+            let timer = setInterval(() => {
+                card.innerHTML = count;
+                count--;
+                if (count < 0) {
+                    clearInterval(timer);
+                    let randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    card.style.background = randomColor;
+                    card.innerHTML = "";
+                    
+                    if (selectedColor === randomColor) {
+                        balance += (selectedAmount * 2);
+                        msg.innerHTML = "<span style='color:green'>Congratulations you win! +" + (selectedAmount * 2) + "</span>";
+                        saveToHistory('Color Prediction', selectedAmount, true);
+                    } else {
+                        balance -= selectedAmount;
+                        msg.innerHTML = "<span style='color:red'>Opps Very Sad! -" + selectedAmount + "</span>";
+                        saveToHistory('Color Prediction', selectedAmount, false);
+                    }
+                    document.getElementById('balance').innerText = balance.toFixed(2);
+                    localStorage.setItem('userBalance', balance);
+                }
+            }, 1000);
+        }
+        applyLanguage();
+    </script>
+</body>
+</html>

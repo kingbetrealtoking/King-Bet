@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Lucky Dice</title>
+    <script src="lang.js"></script> 
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; text-align: center; padding: 15px; }
+        .balance { font-size: 24px; color: #ffcc00; margin-bottom: 20px; }
+        .dice-3d { width: 100px; height: 100px; background: #333; border: 5px solid #ffcc00; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 50px; font-weight: bold; margin: 20px auto; transition: 0.5s; }
+        .rolling { animation: roll 0.5s linear infinite; }
+        @keyframes roll { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+        button { padding: 10px 15px; margin: 5px; border-radius: 5px; border: none; cursor: pointer; }
+        .selected { background: #ffcc00 !important; color: black; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <a href="dashboard.html" style="color:white; display:block; text-align:left; margin-bottom:10px;">← Back</a>
+    <div class="balance">Balance: Rs <span id="bal">1000</span></div>
+    <div class="dice-3d" id="dice">?</div>
+
+    <div>තෝරන්න (1-6):</div>
+    <div id="numBtns"><script>for(let i=1; i<=6; i++) document.write(`<button onclick="selectNum(${i}, this)">${i}</button>`);</script></div>
+
+    <div>මුදල තෝරන්න:</div>
+    <div id="amtBtns"><script>[5,10,20,50,100,250,500].forEach(a => document.write(`<button onclick="selectAmt(${a}, this)">Rs ${a}</button>`));</script></div>
+    <input type="number" id="customAmt" placeholder="Custom (5-500)">
+    <br><br>
+    <button onclick="playDice()" style="background:#28a745; color:white; width: 80%; padding: 15px;">Roll Dice</button>
+    <h3 id="res"></h3>
+
+    <script>
+        let balance = parseFloat(localStorage.getItem('userBalance')) || 1000.00;
+        document.getElementById('bal').innerText = balance.toFixed(2);
+        
+        let selNum = 0, selAmt = 0;
+
+        function selectNum(n, b) { selNum = n; document.querySelectorAll('#numBtns button').forEach(x=>x.classList.remove('selected')); b.classList.add('selected'); }
+        function selectAmt(a, b) { selAmt = a; document.querySelectorAll('#amtBtns button').forEach(x=>x.classList.remove('selected')); b.classList.add('selected'); }
+        
+        // දිනය සහ වෙලාව සහිත History function එක
+        function saveToHistory(gameName, amount, isWin) {
+            let history = JSON.parse(localStorage.getItem('betHistory')) || [];
+            let now = new Date();
+            let timeString = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            history.push({ 
+                game: gameName, 
+                amount: amount, 
+                status: isWin ? 'win' : 'lose',
+                time: timeString 
+            });
+            localStorage.setItem('betHistory', JSON.stringify(history));
+        }
+
+        function playDice() {
+            let bet = parseFloat(document.getElementById('customAmt').value) || selAmt;
+            if(!selNum || bet < 5 || bet > 500) return alert("නිවැරදි තේරීමක් කරන්න!");
+            if(bet > balance) return alert("බැලන්ස් එක මදි!");
+            
+            let d = document.getElementById('dice'); d.classList.add('rolling');
+            setTimeout(() => {
+                d.classList.remove('rolling');
+                let res = Math.floor(Math.random() * 6) + 1;
+                d.innerHTML = res;
+                
+                if(res == selNum) { 
+                    balance += bet; 
+                    document.getElementById('res').innerHTML = `<span style='color:green'>Congratulations! Won Rs ${bet}</span>`; 
+                    saveToHistory('Lucky Dice', bet, true);
+                } else { 
+                    balance -= bet; 
+                    document.getElementById('res').innerHTML = `<span style='color:red'>Opps Very Sad! Lost Rs ${bet}</span>`; 
+                    saveToHistory('Lucky Dice', bet, false);
+                }
+                document.getElementById('bal').innerText = balance.toFixed(2);
+                localStorage.setItem('userBalance', balance);
+            }, 1000);
+        }
+        applyLanguage();
+    </script>
+</body>
+</html>

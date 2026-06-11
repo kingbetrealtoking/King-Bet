@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KingBet - Withdraw</title>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; }
+        .box { background: #333; padding: 20px; border-radius: 15px; border: 1px solid #ffcc00; }
+        h2 { color: #ffcc00; text-align: center; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; box-sizing: border-box; }
+        button { background: #dc3545; color: white; padding: 12px; width: 100%; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Withdraw Funds</h2>
+        <p>ඔබේ ජයග්‍රාහී මුදල් ලබා ගැනීමට අවශ්‍ය තොරතුරු ඇතුළත් කරන්න:</p>
+        <input type="number" id="amt" placeholder="Amount (LKR)">
+        <input type="text" id="acc" placeholder="Your Bank/Easypaisa/JazzCash Number">
+        <button onclick="requestWithdraw()">Request Withdrawal</button>
+    </div>
+
+    <script>
+        function requestWithdraw() {
+            let amount = document.getElementById('amt').value;
+            let acc = document.getElementById('acc').value;
+
+            if(!amount || !acc) { alert("සියලුම විස්තර පුරවන්න!"); return; }
+
+            // History එකට එකතු කිරීම (Withdraw සඳහා)
+            let history = JSON.parse(localStorage.getItem('betHistory')) || [];
+            let now = new Date();
+            let timeString = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            history.push({ 
+                game: 'Withdraw Request', 
+                amount: amount, 
+                status: 'withdraw', // මෙය history.html එකේදී කහ පාටින් පෙන්වීමට උදව් වේ
+                time: timeString 
+            });
+            localStorage.setItem('betHistory', JSON.stringify(history));
+
+            alert('ඉල්ලීම සාර්ථකව යොමු කරන ලදී. අපගේ කණ්ඩායම ඔබව සම්බන්ධ කර ගනු ඇත.');
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>

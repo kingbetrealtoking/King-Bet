@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KingBet - Settings</title>
+    <script src="lang.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; }
+        .section-title { color: #ffcc00; margin-top: 25px; font-size: 14px; text-transform: uppercase; }
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #333; border-radius: 10px; margin-top: 10px; cursor: pointer; }
+        .logout-btn { color: #dc3545; font-weight: bold; justify-content: center; }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <a href="dashboard.html" class="back-btn">← Back</a>
+    
+    <div class="section-title">Account Management</div>
+    <div class="setting-item" onclick="location.href='deposit.html'"><span>Deposit</span> <span>></span></div>
+    <div class="setting-item" onclick="location.href='withdraw.html'"><span>Withdraw</span> <span>></span></div>
+
+    <div class="section-title">App Settings</div>
+    <div class="setting-item">
+        <span data-lang="lang">Language</span>
+        <select id="lang" onchange="localStorage.setItem('userLang', this.value); location.reload();">
+            <option value="en">English</option>
+            <option value="si">සිංහල</option>
+            <option value="ta">தமிழ்</option>
+        </select>
+    </div>
+    
+    <div class="section-title">Extra</div>
+    <div class="setting-item logout-btn" onclick="logout()"><span>Log out</span></div>
+
+    <script>
+        document.getElementById('lang').value = localStorage.getItem('userLang') || 'en';
+        applyLanguage();
+
+        function logout() {
+            if(confirm("Are you sure you want to log out?")) {
+                // මෙතනදී ලොග් අවුට් වීමේදී බැලන්ස් එක අයින් කරන්න හෝ වෙනත් වැඩක් කරන්න පුළුවන්
+                localStorage.removeItem('userBalance'); 
+                location.href = 'index.html'; // ලොගින් පිටුවට යවන්න
+            }
+        }
+    </script>
+</body>
+</html>
