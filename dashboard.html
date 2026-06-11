@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KingBet - Dashboard</title>
+    <script src="lang.js"></script> 
     <style>
-        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; margin: 0; }
+        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; }
         .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .wallet-card { background: #333; padding: 20px; border-radius: 15px; border: 1px solid #ffcc00; text-align: center; }
         .balance { font-size: 32px; color: #ffcc00; font-weight: bold; margin: 10px 0; }
@@ -20,60 +20,32 @@
 </head>
 <body>
     <div class="top-nav">
-        <h2>Dashboard</h2>
-        <a href="settings.html" style="color:#ffcc00; text-decoration:none;">⚙️ Settings</a>
+        <h2 data-lang="dashboard">Dashboard</h2>
+        <a href="settings.html" style="color:#ffcc00; text-decoration:none;">⚙️ <span data-lang="settings">Settings</span></a>
     </div>
     
     <div class="wallet-card">
-        <p>Current Balance</p>
-        <div class="balance" id="bal">0.00</div>
+        <p data-lang="balance">Current Balance</p>
+        <div class="balance" id="bal">1000.00</div>
         <a href="history.html" class="history-link">View Transaction History</a>
     </div>
     
     <div class="btn-box">
-        <button class="dep-btn" onclick="location.href='deposit.html'">Deposit</button>
-        <button class="with-btn" onclick="location.href='withdraw.html'">Withdraw</button>
+        <button class="dep-btn" onclick="location.href='deposit.html'" data-lang="deposit">Deposit</button>
+        <button class="with-btn" onclick="location.href='withdraw.html'" data-lang="withdraw">Withdraw</button>
     </div>
 
     <div class="game-list">
-        <h3>Available Games</h3>
-        <a href="game.html" class="game-item">Color Prediction</a>
-        <a href="game2.html" class="game-item">Lucky Dice</a>
-        <a href="game3.html" class="game-item">Coin Flip</a>
+        <h3 data-lang="games">Available Games</h3>
+        <a href="game.html" class="game-item" data-lang="color">Color Prediction</a>
+        <a href="game2.html" class="game-item" data-lang="dice">Lucky Dice</a>
+        <a href="game3.html" class="game-item" data-lang="coin">Coin Flip</a>
+        <a href="#" class="game-item" data-lang="football">Football Betting</a>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCfYvK9RLWgTYN05JMQ-jLfZfnXfEHMZjo",
-            authDomain: "sl-bet.firebaseapp.com",
-            projectId: "sl-bet",
-            storageBucket: "sl-bet.firebasestorage.app",
-            messagingSenderId: "318305942205",
-            appId: "1:318305942205:web:3697112fdec83fef7cbe44"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app); // මෙතන දැන් හරියට හදලා තියෙන්නේ
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const userDocRef = doc(db, "users", user.uid);
-                onSnapshot(userDocRef, (doc) => {
-                    if (doc.exists()) {
-                        const balance = doc.data().balance || 0;
-                        document.getElementById('bal').innerText = parseFloat(balance).toFixed(2);
-                    }
-                });
-            } else {
-                // පරිශීලකයා ලොග් වෙලා නැත්නම් login.html වෙත යවන්න
-                window.location.href = "login.html";
-            }
-        });
+    <script>
+        document.getElementById('bal').innerText = (parseFloat(localStorage.getItem('userBalance')) || 1000.00).toFixed(2);
+        applyLanguage();
     </script>
 </body>
 </html>
