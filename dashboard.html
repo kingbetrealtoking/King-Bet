@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="si">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KingBet - Dashboard</title>
     <style>
@@ -25,7 +26,7 @@
     
     <div class="wallet-card">
         <p>Current Balance</p>
-        <div class="balance" id="bal">Loading...</div>
+        <div class="balance" id="bal">0.00</div>
         <div class="acc-id" id="accNum">Loading Account...</div>
     </div>
     
@@ -47,25 +48,40 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-        // මෙතනට ඔයාගේ firebaseConfig දාන්න
-        const firebaseConfig = { /* ඔයාගේ config එක මෙතනට දාන්න */ };
+        // ඔබේ Firebase Config දත්ත මෙතැනට අනිවාර්යයෙන්ම ඇතුළත් කරන්න
+        const firebaseConfig = {
+            apiKey: "ඔබේ_API_KEY",
+            authDomain: "ඔබේ_PROJECT_ID.firebaseapp.com",
+            projectId: "ඔබේ_PROJECT_ID",
+            storageBucket: "ඔබේ_PROJECT_ID.appspot.com",
+            messagingSenderId: "ඔබේ_SENDER_ID",
+            appId: "ඔබේ_APP_ID"
+        };
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // පරිශීලකයා ලොග් වී ඇත්දැයි පරීක්ෂා කිරීම
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // ලොග් වූ පරිශීලකයාගේ දත්ත Firestore එකෙන් ලබා ගැනීම
-                onSnapshot(doc(db, "users", user.uid), (doc) => {
+                // පරිශීලකයා ලොග් වී ඇත්නම් Firestore වෙතින් දත්ත ලබා ගැනීම
+                const userRef = doc(db, "users", user.uid);
+                
+                onSnapshot(userRef, (doc) => {
                     if (doc.exists()) {
                         const data = doc.data();
-                        document.getElementById('bal').innerText = parseFloat(data.balance).toFixed(2);
-                        document.getElementById('accNum').innerText = "ID: " + data.accountNumber;
+                        document.getElementById('bal').innerText = parseFloat(data.balance || 0).toFixed(2);
+                        document.getElementById('accNum').innerText = "ID: " + (data.accountNumber || "N/A");
+                    } else {
+                        document.getElementById('accNum').innerText = "ගිණුම් දත්ත හමු නොවීය";
                     }
+                }, (error) => {
+                    console.error("දත්ත ලබා ගැනීමේ දෝෂයක්:", error);
                 });
             } else {
-                window.location.href = "index.html"; // ලොග් වෙලා නැත්නම් login පේජ් එකට යවන්න
+                // ලොග් වී නැත්නම් login පේජ් එකට යැවීම
+                window.location.href = "index.html";
             }
         });
     </script>
