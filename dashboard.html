@@ -48,7 +48,27 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-        // ඔබේ Firebase Config දත්ත මෙතැනට අනිවාර්යයෙන්ම ඇතුළත් කරන්න
+     // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyB4aqoDAOuLiGoO3cx2FPvdF1s8zgn_eU4",
+  authDomain: "king-bet-2aa4f.firebaseapp.com",
+  projectId: "king-bet-2aa4f",
+  storageBucket: "king-bet-2aa4f.firebasestorage.app",
+  messagingSenderId: "461934419384",
+  appId: "1:461934419384:web:172ac798e06bc2a032c34d",
+  measurementId: "G-6KZGYT2J9D"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
         const firebaseConfig = {
             apiKey: "ඔබේ_API_KEY",
             authDomain: "ඔබේ_PROJECT_ID.firebaseapp.com",
